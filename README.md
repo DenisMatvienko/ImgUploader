@@ -8,7 +8,6 @@
 "1х1", а так же больших размеров - будем считать сохранением условий необходимого размера изображений.
 
 #### Install/Установка
-Перед началом необходимо произвести клонирование репозитория на свою операционную систему.
 
 ##### Работа с репозитоием:
 Инициализироать репозиторий:
@@ -34,10 +33,15 @@ Linux:
 source env/bin/activate
 ```
 
+Клонируем репозиторий:
+```
+ git clone https://github.com/DenisMatvienko/ImgUploader
+```
+
 ##### Requirements install/Установка библиотек #####
 Windows:
 ```
-pip install requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Linux:
