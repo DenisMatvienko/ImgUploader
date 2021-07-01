@@ -12,6 +12,9 @@ from .forms import NewImageForm, ImageForm
 
 
 class LinksOfImageListView(ListView):
+    """
+    Get list of images on main page
+    """
     model = Img
     context_object_name = 'images'
     Img.objects.order_by('-pk').all()
@@ -19,14 +22,17 @@ class LinksOfImageListView(ListView):
 
 
 def get_image_by_url(image_url):
-    """ Get by link, rename image by url name """
+    """
+    Getting request url, split on the part and take last entry if url is valid, after that takes image by url, open and
+    convert into 'RGB' format if it isn't, processes the image and save uploaded files in memory
+    """
     name = 'default_name'
     files_in_memory = None
     try:
         request_image_url = requests.get(image_url, stream=True)
     except Exception:
         return None
-    redirect('new')
+    redirect('upload_image')
     if request_image_url.status_code == 200:
         name = urlparse(image_url).path.split('/')[-1]
         taken_image_from_url = Image.open(request_image_url.raw)
@@ -45,8 +51,11 @@ def get_image_by_url(image_url):
     return {'files_in_memory': files_in_memory, 'name': name}
 
 
-def new(request):
-    """ Если получили методом post форму """
+def upload_image(request):
+    """
+    Process which getting check on valid user filling out the form. Display message if one of ways unacceptable, for
+    view.
+    """
     if request.method == 'POST':
         form = NewImageForm(request.POST, request.FILES)
         if form.is_valid():
@@ -57,22 +66,25 @@ def new(request):
             elif form.cleaned_data['imageName'] and not form.cleaned_data['imageFile']:
                 img = get_image_by_url(form.cleaned_data['imageName'])
                 if img is None:
-                    error = 'Неверная ссылка'
-                    return render(request, 'new.html', {'form': form, 'error': error})
+                    message = 'ССылка не корректна'
+                    return render(request, 'upload_image.html', {'form': form, 'message': message})
                 image = img['files_in_memory']
                 name = img['name']
                 width, height = get_image_dimensions(img['files_in_memory'])
             else:
-                error = 'Можно использовать только один способ загрузки изображения'
-                return render(request, 'new.html', {'form': form, 'error': error})
+                message = 'Загрузить изображение необходимо только одним из вариантов "По ссылке", либо выбрав файл'
+                return render(request, 'upload_image.html', {'form': form, 'message': message})
             result = Img.objects.create(image=image, name=name, width=width, height=height)
-            return redirect('img_view', img_id=result.pk)
+            return redirect('get_image_size', img_id=result.pk)
     else:
         form = NewImageForm()
-    return render(request, 'new.html', {'form': form})
+    return render(request, 'upload_image.html', {'form': form})
 
 
-def img_view(request, img_id):
+def get_image_size(request, img_id):
+    """
+    Height & Width counter. Resizing or save parameters entered into the field by user.
+    """
     image = get_object_or_404(Img, pk=img_id)
     size = str(image.width) + 'x' + str(image.height)
     form = ImageForm(request.POST or None, instance=image)
@@ -93,6 +105,6 @@ def img_view(request, img_id):
             except ZeroDivisionError:
                 new_size.height = 480
         new_size.save()
-        return redirect('img_view', img_id=image.pk)
+        return redirect('get_image_size', img_id=image.pk)
     context = {'form': form, 'image': image, 'size': size}
-    return render(request, 'img_view.html', context)
+    return render(request, 'get_image_size.html', context)

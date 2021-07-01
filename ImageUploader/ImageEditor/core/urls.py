@@ -4,6 +4,6 @@ from . import views
 
 urlpatterns = [
     path('', views.LinksOfImageListView.as_view(), name='index'),
-    path("new", views.new, name="new"),
-    path("images/<int:img_id>/", views.img_view, name="img_view"),
+    path('upload_image', views.upload_image, name='upload_image'),
+    path('count_images_size/<int:img_id>/', views.get_image_size, name='get_image_size'),
 ]
