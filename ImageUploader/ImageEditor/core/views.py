@@ -4,8 +4,8 @@ from PIL import Image
 from io import BytesIO
 from urllib.parse import urlparse
 from django.core.files.uploadedfile import InMemoryUploadedFile
-import requests
 from django.views.generic import ListView, View
+import requests
 
 from .models import Img
 from .forms import NewImageForm, ImageForm
