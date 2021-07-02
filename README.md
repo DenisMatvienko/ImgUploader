@@ -16,12 +16,6 @@
  git init
 ```
 
-При необходимости, добавить в .gitignore свое окружение:
-
-```
- echo 'venv' > .gitignore
-```
-
 ##### Virtual env. activate/Активация виртуального окружения #####
 Windows:
 ```
